@@ -58,16 +58,10 @@ export function startInactivityService(client, db) {
                 const message = getRandomPurgeMessage(roleName);
                 const gifUrl = getRandomPurgeGif();
                 
+                console.log(`Sending purge message with GIF: ${gifUrl}`);
+                
                 await targetChannel.send({
-                  content: `${message}`,
-                  embeds: [{
-                    color: 0xFF0000, // Red color
-                    description: `<@${member.id}> lost their **${roleName}** role due to inactivity!`,
-                    image: {
-                      url: gifUrl
-                    },
-                    timestamp: new Date().toISOString()
-                  }]
+                  content: `${message}\n<@${member.id}> lost their **${roleName}** role due to inactivity!\n${gifUrl}`,
                 });
               }
             } catch (error) {
