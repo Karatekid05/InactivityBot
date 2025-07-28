@@ -58,7 +58,7 @@ export function startInactivityService(client, db) {
                 const message = getRandomPurgeMessage(roleName);
                 const gifUrl = getRandomPurgeGif();
                 
-                await generalChannel.send({
+                await targetChannel.send({
                   content: `${message}`,
                   embeds: [{
                     color: 0xFF0000, // Red color
