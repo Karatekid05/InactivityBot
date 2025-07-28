@@ -1,0 +1,16 @@
+{
+  "name": "inactivity-bot",
+  "version": "1.0.0",
+  "description": "Discord bot to remove roles from inactive users.",
+  "main": "src/bot.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/bot.js",
+    "deploy": "node src/deploy-commands.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "better-sqlite3": "^8.6.0",
+    "dotenv": "^16.4.5"
+  }
+} 
