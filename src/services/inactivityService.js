@@ -59,10 +59,14 @@ export function startInactivityService(client, db) {
                 const roleName = guild.roles.cache.get(role.role_id)?.name || 'Unknown Role';
                 const { message, gifUrl } = getRandomPurgeMessageAndGif(roleName);
                 
+                console.log(`Role name: ${roleName}`);
+                console.log(`Message: ${message}`);
+                console.log(`GIF URL: ${gifUrl}`);
                 console.log(`Sending purge message with GIF: ${gifUrl}`);
                 
                 // Create attachment from local GIF file
                 const gifPath = join(process.cwd(), gifUrl);
+                console.log(`GIF Path: ${gifPath}`);
                 const attachment = new AttachmentBuilder(gifPath, { name: 'purge.gif' });
                 
                 await targetChannel.send({
