@@ -8,19 +8,19 @@ const purgeMessages = [
   "User got the boot and lost {role} role!",
   "Another purge victim - {role} role eliminated!",
   "User disappeared and lost {role} privileges!",
-  "Inactivity purge successful - {role} role removed!",
+  "User got Thanos snapped - {role} role vanished!",
   "User got cleaned and lost {role} status!"
 ];
 
-// Random GIF URLs (you can add more)
+// Random GIF URLs (Tenor direct links)
 const purgeGifs = [
-  "https://tenor.com/view/rick-falling-off-a-cliff-gif-20556640", // Person falling
-  "https://tenor.com/view/homer-cloud-homer-simpson-simpsons-the-simpsons-gif-5392692", // Simpson
-  "https://tenor.com/view/disappear-gif-10108384", // Disappearing
-  "https://tenor.com/view/langley-thanos-gif-20432464", // Thanos 1
-  "https://tenor.com/view/yeet-lion-king-simba-rafiki-throw-gif-16194362",  // Simba yeet
-  "https://tenor.com/view/thanos-endgame-avengers-gone-ashes-gif-14019029", // Thanos 2
-  "https://tenor.com/view/purge-button-press-fast-gif-17107922", // Purge button
+  "https://media.tenor.com/20556640/rick-falling-off-a-cliff.gif", // Person falling
+  "https://media.tenor.com/5392692/homer-cloud-homer-simpson-simpsons-the-simpsons.gif", // Simpson
+  "https://media.tenor.com/10108384/disappear.gif", // Disappearing
+  "https://media.tenor.com/20432464/langley-thanos.gif", // Thanos 1
+  "https://media.tenor.com/16194362/yeet-lion-king-simba-rafiki-throw.gif",  // Simba yeet
+  "https://media.tenor.com/14019029/thanos-endgame-avengers-gone-ashes.gif", // Thanos 2
+  "https://media.tenor.com/17107922/purge-button-press-fast.gif", // Purge button
 ];
 
 export function getRandomPurgeMessage(roleName) {
