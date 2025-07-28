@@ -23,4 +23,10 @@ CREATE TABLE IF NOT EXISTS removal_logs (
 -- Indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_removal_logs_removed_at ON removal_logs(removed_at DESC);
 CREATE INDEX IF NOT EXISTS idx_removal_logs_user_id ON removal_logs(user_id);
-CREATE INDEX IF NOT EXISTS idx_removal_logs_role_id ON removal_logs(role_id); 
+CREATE INDEX IF NOT EXISTS idx_removal_logs_role_id ON removal_logs(role_id);
+
+-- Bot configuration
+CREATE TABLE IF NOT EXISTS bot_config (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+); 

@@ -1,4 +1,5 @@
 import { Events } from 'discord.js';
+import { getRandomPurgeMessage, getRandomPurgeGif } from '../utils/messages.js';
 
 export function startInactivityService(client, db) {
   // Atualiza atividade ao enviar mensagem
@@ -34,6 +35,44 @@ export function startInactivityService(client, db) {
             await member.roles.remove(role.role_id, 'Inactivity');
             db.prepare('INSERT INTO removal_logs (user_id, role_id, removed_at) VALUES (?, ?, ?)')
               .run(member.id, role.role_id, now);
+            
+            // Send purge message to configured channel
+            try {
+              // Get configured channel or fallback to general
+              const config = db.prepare('SELECT value FROM bot_config WHERE key = ?').get('purge_channel_id');
+              let targetChannel = null;
+              
+              if (config) {
+                targetChannel = guild.channels.cache.get(config.value);
+              }
+              
+              // Fallback to general channel if no config or channel not found
+              if (!targetChannel) {
+                targetChannel = guild.channels.cache.find(channel => 
+                  channel.name === 'general' && channel.type === 0 // 0 = text channel
+                );
+              }
+              
+                              if (targetChannel) {
+                const roleName = guild.roles.cache.get(role.role_id)?.name || 'Unknown Role';
+                const message = getRandomPurgeMessage(roleName);
+                const gifUrl = getRandomPurgeGif();
+                
+                await generalChannel.send({
+                  content: `${message}`,
+                  embeds: [{
+                    color: 0xFF0000, // Red color
+                    description: `<@${member.id}> lost their **${roleName}** role due to inactivity!`,
+                    image: {
+                      url: gifUrl
+                    },
+                    timestamp: new Date().toISOString()
+                  }]
+                });
+              }
+            } catch (error) {
+              console.error('Error sending purge message:', error);
+            }
           }
         }
       }
