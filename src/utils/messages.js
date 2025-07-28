@@ -14,13 +14,13 @@ const purgeMessages = [
 
 // Random GIF URLs (Tenor page links para embed Discord)
 const purgeGifs = [
-  "https://tenor.com/view/thanos-snap-avengers-infinity-war-gif-12149187",
-  "https://tenor.com/view/yeet-throw-gif-17357889",
-  "https://tenor.com/view/disappear-magic-gif-10108384",
-  "https://tenor.com/view/homer-simpson-bush-gif-3530837",
-  "https://tenor.com/view/purge-button-press-fast-gif-17107922",
-  "https://tenor.com/view/bye-falling-fall-off-cliff-gif-20556640",
-  "https://tenor.com/view/shadow-realm-yu-gi-oh-gif-15198019"
+  "https://tenor.com/view/rick-falling-off-a-cliff-gif-20556640", // Person falling
+  "https://tenor.com/view/homer-cloud-homer-simpson-simpsons-the-simpsons-gif-5392692", // Simpson
+  "https://tenor.com/view/disappear-gif-10108384", // Disappearing
+  "https://tenor.com/view/langley-thanos-gif-20432464", // Thanos 1
+  "https://tenor.com/view/yeet-lion-king-simba-rafiki-throw-gif-16194362",  // Simba yeet
+  "https://tenor.com/view/thanos-endgame-avengers-gone-ashes-gif-14019029", // Thanos 2
+  "https://tenor.com/view/purge-button-press-fast-gif-17107922", // Purge button
 ];
 
 export function getRandomPurgeMessage(roleName) {
