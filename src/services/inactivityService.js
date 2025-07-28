@@ -1,5 +1,7 @@
-import { Events } from 'discord.js';
+import { Events, AttachmentBuilder } from 'discord.js';
 import { getRandomPurgeMessageAndGif } from '../utils/messages.js';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 export function startInactivityService(client, db) {
   // Atualiza atividade ao enviar mensagem
@@ -59,8 +61,21 @@ export function startInactivityService(client, db) {
                 
                 console.log(`Sending purge message with GIF: ${gifUrl}`);
                 
+                // Create attachment from local GIF file
+                const gifPath = join(process.cwd(), gifUrl);
+                const attachment = new AttachmentBuilder(gifPath, { name: 'purge.gif' });
+                
                 await targetChannel.send({
-                  content: `${message}\n<@${member.id}> lost their **${roleName}** role due to inactivity!\n${gifUrl}`,
+                  content: `${message}`,
+                  embeds: [{
+                    color: 0xFF0000, // Red color
+                    description: `<@${member.id}> lost their **${roleName}** role due to inactivity!`,
+                    image: {
+                      url: 'attachment://purge.gif'
+                    },
+                    timestamp: new Date().toISOString()
+                  }],
+                  files: [attachment]
                 });
               }
             } catch (error) {
