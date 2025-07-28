@@ -1,5 +1,5 @@
 import { Events } from 'discord.js';
-import { getRandomPurgeMessage, getRandomPurgeGif } from '../utils/messages.js';
+import { getRandomPurgeMessageAndGif } from '../utils/messages.js';
 
 export function startInactivityService(client, db) {
   // Atualiza atividade ao enviar mensagem
@@ -55,8 +55,7 @@ export function startInactivityService(client, db) {
               
                               if (targetChannel) {
                 const roleName = guild.roles.cache.get(role.role_id)?.name || 'Unknown Role';
-                const message = getRandomPurgeMessage(roleName);
-                const gifUrl = getRandomPurgeGif();
+                const { message, gifUrl } = getRandomPurgeMessageAndGif(roleName);
                 
                 console.log(`Sending purge message with GIF: ${gifUrl}`);
                 
