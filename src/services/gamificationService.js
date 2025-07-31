@@ -1,4 +1,6 @@
-import { Events } from 'discord.js';
+import { Events, AttachmentBuilder } from 'discord.js';
+import { getRandomEliteMessageAndGif } from '../utils/eliteMessages.js';
+import { join } from 'path';
 
 // Role IDs
 const ELITE_ROLE_ID = '1400429497572135112';
@@ -66,7 +68,7 @@ export function startGamificationService(client, db) {
       
       // Check if user should get Elite role
       if (Math.random() < chance) {
-        await assignEliteRole(message.member, db);
+        await assignEliteRole(message.member, db, message.guild);
       }
       
     } catch (error) {
@@ -166,7 +168,7 @@ export function startGamificationService(client, db) {
   console.log('Gamification service started successfully!');
 }
 
-async function assignEliteRole(member, db) {
+async function assignEliteRole(member, db, guild) {
   try {
     // Check if user already has Elite role
     if (member.roles.cache.has(ELITE_ROLE_ID)) {
@@ -190,7 +192,75 @@ async function assignEliteRole(member, db) {
     
     console.log(`🎉 User ${member.user.tag} won the Elite role through random chance!`);
     
+    // Send celebration message
+    await sendEliteCelebrationMessage(member, guild, db);
+    
   } catch (error) {
     console.error(`Error assigning Elite role to ${member.user.tag}:`, error.message);
+  }
+}
+
+async function sendEliteCelebrationMessage(member, guild, db) {
+  try {
+    // Get configured Elite channel or fallback to general
+    const config = db.prepare('SELECT value FROM bot_config WHERE key = ?').get('elite_channel_id');
+    let targetChannel = null;
+    
+    if (config) {
+      targetChannel = guild.channels.cache.get(config.value);
+    }
+    
+    // Fallback to general channel if no config or channel not found
+    if (!targetChannel) {
+      targetChannel = guild.channels.cache.find(channel => 
+        channel.name === 'general' && channel.type === 0 // 0 = text channel
+      );
+    }
+    
+    if (targetChannel) {
+      const { message, gif } = getRandomEliteMessageAndGif();
+      
+      console.log(`Elite celebration message: ${message}`);
+      console.log(`Elite celebration GIF: ${gif}`);
+      
+      // Create attachment from local GIF file
+      const gifPath = join(process.cwd(), gif);
+      
+      try {
+        const attachment = new AttachmentBuilder(gifPath, { name: 'elite-celebration.gif' });
+        
+        await targetChannel.send({
+          content: `${message}`,
+          embeds: [{
+            color: 0xFFD700, // Gold color for Elite
+            description: `🎊 **Congratulations <@${member.id}>!** You've achieved **ELITE** status! 🎊`,
+            image: {
+              url: 'attachment://elite-celebration.gif'
+            },
+            footer: {
+              text: 'Elite Gamification System'
+            },
+            timestamp: new Date().toISOString()
+          }],
+          files: [attachment]
+        });
+      } catch (gifError) {
+        console.error(`Failed to send Elite celebration GIF ${gifPath}:`, gifError.message);
+        // Fallback: send message without GIF
+        await targetChannel.send({
+          content: `${message}`,
+          embeds: [{
+            color: 0xFFD700,
+            description: `🎊 **Congratulations <@${member.id}>!** You've achieved **ELITE** status! 🎊`,
+            footer: {
+              text: 'Elite Gamification System'
+            },
+            timestamp: new Date().toISOString()
+          }]
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Error sending Elite celebration message:', error.message);
   }
 } 
