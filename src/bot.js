@@ -96,9 +96,11 @@ client.on('interactionCreate', async interaction => {
 // Activity tracking and role removal logic will be in a service
 import { startInactivityService } from './services/inactivityService.js';
 import { startLogCleanupService } from './services/logCleanupService.js';
+import { startGamificationService } from './services/gamificationService.js';
 
 startInactivityService(client, db);
 startLogCleanupService(db);
+startGamificationService(client, db);
 
 // Login with error handling
 client.login(process.env.DISCORD_TOKEN).catch(error => {
