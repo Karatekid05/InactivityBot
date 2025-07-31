@@ -1,5 +1,6 @@
 import { Events, AttachmentBuilder } from 'discord.js';
 import { getRandomEliteMessageAndGif } from '../utils/eliteMessages.js';
+import { getRandomPurgeMessageAndGif } from '../utils/messages.js';
 import { join } from 'path';
 
 // Role IDs
@@ -115,6 +116,9 @@ export function startGamificationService(client, db) {
           `).run(userData.user_id);
           
           console.log(`User ${member.user.tag} became inactive and received Purged role`);
+          
+          // Send purge message for losing Elite role
+          await sendElitePurgeMessage(member, guild, db);
           
         } catch (error) {
           console.error(`Error processing inactive user ${userData.user_id}:`, error.message);
@@ -242,5 +246,61 @@ async function sendEliteCelebrationMessage(member, channel, db) {
     }
   } catch (error) {
     console.error('Error sending Elite celebration message:', error.message);
+  }
+}
+
+async function sendElitePurgeMessage(member, guild, db) {
+  try {
+    // Get configured channel or fallback to general
+    const config = db.prepare('SELECT value FROM bot_config WHERE key = ?').get('purge_channel_id');
+    let targetChannel = null;
+    
+    if (config) {
+      targetChannel = guild.channels.cache.get(config.value);
+    }
+    
+    // Fallback to general channel if no config or channel not found
+    if (!targetChannel) {
+      targetChannel = guild.channels.cache.find(channel => 
+        channel.name === 'general' && channel.type === 0 // 0 = text channel
+      );
+    }
+    
+    if (targetChannel) {
+      const { message, gif } = getRandomPurgeMessageAndGif('Elite');
+      
+      // Create attachment from local GIF file
+      const gifPath = join(process.cwd(), gif);
+      
+      try {
+        const attachment = new AttachmentBuilder(gifPath, { name: 'elite-purge.gif' });
+        
+        await targetChannel.send({
+          content: `${message}`,
+          embeds: [{
+            color: 0xFF0000, // Red color for purge
+            description: `<@${member.id}> lost their **Elite** role due to inactivity!`,
+            image: {
+              url: 'attachment://elite-purge.gif'
+            },
+            timestamp: new Date().toISOString()
+          }],
+          files: [attachment]
+        });
+      } catch (gifError) {
+        console.error(`Failed to send Elite purge GIF:`, gifError.message);
+        // Fallback: send message without GIF
+        await targetChannel.send({
+          content: `${message}`,
+          embeds: [{
+            color: 0xFF0000,
+            description: `<@${member.id}> lost their **Elite** role due to inactivity!`,
+            timestamp: new Date().toISOString()
+          }]
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Error sending Elite purge message:', error.message);
   }
 } 
