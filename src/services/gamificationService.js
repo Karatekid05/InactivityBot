@@ -190,7 +190,7 @@ async function assignEliteRole(member, db, channel) {
       WHERE user_id = ?
     `).run(member.id);
     
-    console.log(`🎉 User ${member.user.tag} won the Elite role through random chance!`);
+    console.log(`Elite role assigned to ${member.user.tag}`);
     
     // Send celebration message in the same channel where they sent the message
     await sendEliteCelebrationMessage(member, channel, db);
@@ -203,9 +203,6 @@ async function assignEliteRole(member, db, channel) {
 async function sendEliteCelebrationMessage(member, channel, db) {
   try {
     const { message, gif } = getRandomEliteMessageAndGif();
-    
-    console.log(`Elite celebration message: ${message}`);
-    console.log(`Elite celebration GIF: ${gif}`);
     
     // Create attachment from local GIF file
     const gifPath = join(process.cwd(), gif);
@@ -229,7 +226,7 @@ async function sendEliteCelebrationMessage(member, channel, db) {
         files: [attachment]
       });
     } catch (gifError) {
-      console.error(`Failed to send Elite celebration GIF ${gifPath}:`, gifError.message);
+      console.error(`Failed to send Elite celebration GIF:`, gifError.message);
       // Fallback: send message without GIF
       await channel.send({
         content: `${message}`,
