@@ -1,5 +1,6 @@
 import { Events, AttachmentBuilder } from 'discord.js';
 import { getRandomPurgeMessageAndGif } from '../utils/messages.js';
+import { getRandomEliteMessageAndGif } from '../utils/eliteMessages.js';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -71,21 +72,48 @@ export function startInactivityService(client, db) {
     try {
       const roles = db.prepare('SELECT * FROM monitored_roles').all();
       const now = Math.floor(Date.now() / 1000);
-      
+
+      // Elite celebration
+      try {
+        const eliteRoleCfg = db.prepare('SELECT value FROM bot_config WHERE key = ?').get('elite_role_id');
+        if (eliteRoleCfg) {
+          const eliteRoleId = eliteRoleCfg.value;
+          const gainedElite = !oldMember.roles.cache.has(eliteRoleId) && newMember.roles.cache.has(eliteRoleId);
+          if (gainedElite) {
+            const eliteChannelCfg = db.prepare('SELECT value FROM bot_config WHERE key = ?').get('elite_channel_id');
+            const channel = eliteChannelCfg ? newMember.guild.channels.cache.get(eliteChannelCfg.value) : null;
+            const targetChannel = channel || newMember.guild.channels.cache.find(ch => ch.name === 'general' && ch.type === 0);
+            if (targetChannel) {
+              const { message, gif } = getRandomEliteMessageAndGif();
+              const gifPath = join(process.cwd(), gif);
+              const attachment = new AttachmentBuilder(gifPath, { name: 'elite.gif' });
+              await targetChannel.send({
+                content: `${message} Welcome <@${newMember.id}>!`,
+                embeds: [{
+                  color: 0xFFD700,
+                  description: `User <@${newMember.id}> just earned the **Elite** role!`,
+                  image: { url: 'attachment://elite.gif' },
+                  timestamp: new Date().toISOString()
+                }],
+                files: [attachment]
+              });
+            }
+          }
+        }
+      } catch (eliteErr) {
+        console.error('Error sending Elite celebration message:', eliteErr.message);
+      }
+
       for (const role of roles) {
         // Check if user gained a monitored role
         if (!oldMember.roles.cache.has(role.role_id) && newMember.roles.cache.has(role.role_id)) {
-          console.log(`User ${newMember.user.tag} gained monitored role ${role.role_id}`);
-          
           // Add user to activity tracking
           db.prepare('INSERT OR REPLACE INTO user_activity (user_id, role_id, last_activity) VALUES (?, ?, ?)')
             .run(newMember.id, role.role_id, now);
         }
-        
+
         // Check if user lost a monitored role
         if (oldMember.roles.cache.has(role.role_id) && !newMember.roles.cache.has(role.role_id)) {
-          console.log(`User ${newMember.user.tag} lost monitored role ${role.role_id}`);
-          
           // Remove user from activity tracking
           db.prepare('DELETE FROM user_activity WHERE user_id = ? AND role_id = ?').run(newMember.id, role.role_id);
         }

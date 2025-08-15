@@ -3,4 +3,5 @@ export * from './removerole.js';
 export * from './profile.js';
 export * from './logs.js';
 export * from './logstats.js';
-export * from './setchannel.js'; 
+export * from './setchannel.js';
+export * from './setelite.js'; 
